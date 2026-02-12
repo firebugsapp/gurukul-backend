@@ -50,23 +50,18 @@ const registerUser = async (req, res) => {
 // ======================
 const loginUser = async (req, res) => {
   try {
+    const { idNumber, password, role } = req.body;
 
     console.log("QUERY ROLE:", role);
-
-    const { idNumber, password, role } = req.body;
 
     if (!idNumber || !password || !role) {
       return res.status(400).json({ message: "All fields are required" });
     }
 
-
-    // 🔥 MAIN FIX — role + idNumber match
     const user = await User.findOne({
       idNumber,
       role: role.toLowerCase()
     });
-
-    console.log("FOUND USER:", user);
 
     if (!user) {
       return res.status(400).json({ message: "Invalid credentials" });
@@ -87,15 +82,11 @@ const loginUser = async (req, res) => {
     return res.status(200).json({
       message: "Login successful ✅",
       token,
-      user: {
-        id: user._id,
-        name: user.name,
-        idNumber: user.idNumber,
-        role: user.role,
-      },
+      user
     });
 
   } catch (error) {
+    console.log(error);
     return res.status(500).json({ message: "Server error" });
   }
 };
