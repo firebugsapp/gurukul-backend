@@ -1,16 +1,35 @@
 const Attendance = require("../models/Attendance");
 
 // ======================
-// MARK ATTENDANCE
+// MARK / UPDATE ATTENDANCE (SAFE)
 // ======================
 const markAttendance = async (req, res) => {
   try {
     const { studentId, date, status } = req.body;
 
     if (!studentId || !date) {
-      return res.status(400).json({ message: "studentId and date are required" });
+      return res.status(400).json({
+        message: "studentId and date are required",
+      });
     }
 
+    // 🔍 check if attendance already exists
+    const existing = await Attendance.findOne({ studentId, date });
+
+    if (existing) {
+      // UPDATE
+      existing.status = status || existing.status;
+      existing.markedBy = req.user.id;
+
+      await existing.save();
+
+      return res.status(200).json({
+        message: "Attendance updated successfully ✅",
+        attendance: existing,
+      });
+    }
+
+    // CREATE NEW
     const attendance = await Attendance.create({
       studentId,
       date,
@@ -22,6 +41,7 @@ const markAttendance = async (req, res) => {
       message: "Attendance marked successfully ✅",
       attendance,
     });
+
   } catch (error) {
     return res.status(500).json({
       message: "Attendance marking failed ❌",
@@ -58,8 +78,7 @@ const getAttendanceByStudent = async (req, res) => {
   try {
     const { studentId } = req.params;
 
-    const records = await Attendance.find({ studentId })
-      .sort({ date: -1 });
+    const records = await Attendance.find({ studentId }).sort({ date: -1 });
 
     return res.status(200).json({
       message: "Student attendance fetched ✅",
@@ -72,7 +91,7 @@ const getAttendanceByStudent = async (req, res) => {
 };
 
 // ======================
-// UPDATE ATTENDANCE
+// UPDATE ATTENDANCE (by id)
 // ======================
 const updateAttendance = async (req, res) => {
   try {
@@ -125,17 +144,18 @@ const deleteAttendance = async (req, res) => {
 };
 
 // ======================
-// MONTHLY REPORT (STUDENT WISE)
+// MONTHLY REPORT
 // ======================
 const monthlyReport = async (req, res) => {
   try {
     const { studentId, month, year } = req.params;
 
     if (!studentId || !month || !year) {
-      return res.status(400).json({ message: "studentId, month and year required" });
+      return res.status(400).json({
+        message: "studentId, month and year required",
+      });
     }
 
-    // month format: 02, 03 etc
     const startDate = `${year}-${month}-01`;
     const endDate = `${year}-${month}-31`;
 
@@ -144,11 +164,12 @@ const monthlyReport = async (req, res) => {
       date: { $gte: startDate, $lte: endDate },
     });
 
-    const presentCount = records.filter((r) => r.status === "Present").length;
-    const absentCount = records.filter((r) => r.status === "Absent").length;
+    const presentCount = records.filter(r => r.status === "Present").length;
+    const absentCount = records.filter(r => r.status === "Absent").length;
     const total = records.length;
 
-    const percentage = total === 0 ? 0 : ((presentCount / total) * 100).toFixed(2);
+    const percentage =
+      total === 0 ? 0 : ((presentCount / total) * 100).toFixed(2);
 
     return res.status(200).json({
       message: "Monthly attendance report fetched ✅",
@@ -171,7 +192,5 @@ module.exports = {
   getAttendanceByStudent,
   updateAttendance,
   deleteAttendance,
-  monthlyReport
+  monthlyReport,
 };
-
-
