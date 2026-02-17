@@ -3,7 +3,7 @@ const router = express.Router();
 
 const {
   markAttendance,
-  getAttendanceByDate,
+  getAttendanceByDateAndClass,
   getAttendanceByStudent,
   updateAttendance,
   deleteAttendance,
