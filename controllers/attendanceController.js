@@ -86,6 +86,26 @@ const getAttendanceByDateAndClass = async (req, res) => {
 };
 
 // ======================
+// GET ATTENDANCE BY STUDENT
+// ======================
+const getAttendanceByStudent = async (req, res) => {
+  try {
+    const { studentId } = req.params;
+
+    const records = await Attendance.find({ studentId })
+      .sort({ date: -1 });
+
+    return res.status(200).json({
+      message: "Student attendance fetched ✅",
+      total: records.length,
+      attendance: records,
+    });
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
+  }
+};
+
+// ======================
 // UPDATE ATTENDANCE (by id)
 // ======================
 const updateAttendance = async (req, res) => {
