@@ -16,8 +16,8 @@ const protect = require("../middleware/authMiddleware");
 // MARK ATTENDANCE
 router.post("/mark", protect, markAttendance);
 
-// GET ATTENDANCE BY DATE
-router.get("/date/:date", protect, getAttendanceByDate);
+// GET ATTENDANCE BY DATE + CLASS
+router.get("/by-date-class", authMiddleware, getAttendanceByDateAndClass);
 
 // GET ATTENDANCE BY STUDENT
 router.get("/student/:studentId", protect, getAttendanceByStudent);
