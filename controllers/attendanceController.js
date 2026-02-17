@@ -5,19 +5,22 @@ const Attendance = require("../models/Attendance");
 // ======================
 const markAttendance = async (req, res) => {
   try {
-    const { studentId, date, status } = req.body;
+    const { studentId, date, status, className } = req.body;
 
-    if (!studentId || !date) {
+    if (!studentId || !date || !className) {
       return res.status(400).json({
-        message: "studentId and date are required",
+        message: "studentId, date and className are required",
       });
     }
 
-    // 🔍 check if attendance already exists
-    const existing = await Attendance.findOne({ studentId, date });
+    // 🔍 SAME student + date + class
+    const existing = await Attendance.findOne({
+      studentId,
+      date,
+      className,
+    });
 
     if (existing) {
-      // UPDATE
       existing.status = status || existing.status;
       existing.markedBy = req.user.id;
 
@@ -34,6 +37,7 @@ const markAttendance = async (req, res) => {
       studentId,
       date,
       status: status || "Present",
+      className, // 🔥 IMPORTANT
       markedBy: req.user.id,
     });
 
@@ -51,14 +55,23 @@ const markAttendance = async (req, res) => {
 };
 
 // ======================
-// GET ATTENDANCE BY DATE
+// GET ATTENDANCE BY DATE + CLASS
 // ======================
-const getAttendanceByDate = async (req, res) => {
+const getAttendanceByDateAndClass = async (req, res) => {
   try {
-    const { date } = req.params;
+    const { date, className } = req.query;
 
-    const attendanceList = await Attendance.find({ date })
-      .populate("studentId", "name className section rollNumber")
+    if (!date || !className) {
+      return res.status(400).json({
+        message: "date and className required",
+      });
+    }
+
+    const attendanceList = await Attendance.find({
+      date,
+      className,
+    })
+      .populate("studentId", "name rollNumber fatherName")
       .populate("markedBy", "name role");
 
     return res.status(200).json({
@@ -66,25 +79,7 @@ const getAttendanceByDate = async (req, res) => {
       total: attendanceList.length,
       attendance: attendanceList,
     });
-  } catch (error) {
-    return res.status(500).json({ message: error.message });
-  }
-};
 
-// ======================
-// GET ATTENDANCE BY STUDENT
-// ======================
-const getAttendanceByStudent = async (req, res) => {
-  try {
-    const { studentId } = req.params;
-
-    const records = await Attendance.find({ studentId }).sort({ date: -1 });
-
-    return res.status(200).json({
-      message: "Student attendance fetched ✅",
-      total: records.length,
-      attendance: records,
-    });
   } catch (error) {
     return res.status(500).json({ message: error.message });
   }
@@ -188,7 +183,7 @@ const monthlyReport = async (req, res) => {
 
 module.exports = {
   markAttendance,
-  getAttendanceByDate,
+  getAttendanceByDateAndClass,
   getAttendanceByStudent,
   updateAttendance,
   deleteAttendance,
