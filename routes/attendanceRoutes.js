@@ -10,14 +10,14 @@ const {
   monthlyReport
 } = require("../controllers/attendanceController");
 
-
+ 
 const protect = require("../middleware/authMiddleware");
 
 // MARK ATTENDANCE
-router.post("/mark", authMiddleware, markAttendance);
+router.post("/mark", protect, markAttendance);
 
 // GET ATTENDANCE BY DATE + CLASS
-router.get("/by-date-class", authMiddleware, getAttendanceByDateAndClass);
+router.get("/by-date-class", protect, getAttendanceByDateAndClass);
 
 // GET ATTENDANCE BY STUDENT
 router.get("/student/:studentId", protect, getAttendanceByStudent);
