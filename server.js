@@ -14,6 +14,7 @@ const attendanceRoutes = require("./routes/attendanceRoutes");
 const teacherRoutes = require("./routes/teacherRoutes");
 const feeRoutes = require("./routes/feeRoutes");
 const admissionRoutes = require("./routes/admissionRoutes");
+const sliderImageRoutes = require("./routes/sliderImageRoutes");
 
 
 
@@ -38,6 +39,7 @@ app.use("/api/attendance", attendanceRoutes);
 app.use("/api/teachers", teacherRoutes);
 app.use("/api/fees", feeRoutes);
 app.use("/api/admissions", admissionRoutes);
+app.use("/api", sliderImageRoutes);
 
 
 
