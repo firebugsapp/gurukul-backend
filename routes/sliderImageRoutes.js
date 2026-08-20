@@ -4,7 +4,7 @@ const {
   getSliderImages
 } = require("../controllers/sliderImageController");
 
-const authMiddleware = require("../middleware/auth");
+const authMiddleware = require("../middleware/authMiddleware");
 
 // Student / Public (Token required)
 router.get("/slider-images", authMiddleware, getSliderImages);
