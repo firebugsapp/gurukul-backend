@@ -16,7 +16,7 @@ const feeRoutes = require("./routes/feeRoutes");
 const admissionRoutes = require("./routes/admissionRoutes");
 const sliderImageRoutes = require("./routes/sliderImageRoutes");
 const noticeRoutes = require("./routes/noticeRoutes");
-
+const fcmRoutes = require("./routes/fcmRoutes");
 
 
 
@@ -42,7 +42,7 @@ app.use("/api/fees", feeRoutes);
 app.use("/api/admissions", admissionRoutes);
 app.use("/api", sliderImageRoutes);
 app.use("/api", noticeRoutes);
-
+app.use("/api/student", fcmRoutes);
 
 
 
