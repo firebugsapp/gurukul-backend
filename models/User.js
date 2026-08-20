@@ -2,28 +2,34 @@ const mongoose = require("mongoose");
 
 const userSchema = new mongoose.Schema(
   {
-    name: { 
-      type: String, 
-      required: true, 
-      trim: true 
+    name: {
+      type: String,
+      required: true,
+      trim: true
     },
 
-    idNumber: { 
-      type: String, 
-      required: true, 
-      unique: true 
+    idNumber: {
+      type: String,
+      required: true,
+      unique: true
     },
 
-    password: { 
-      type: String, 
-      required: true 
+    password: {
+      type: String,
+      required: true
     },
 
     role: {
       type: String,
       enum: ["admin", "teacher", "student", "parent"],
-      default: "student",
+      default: "student"
     },
+
+    // FCM Notification Token
+    fcmToken: {
+      type: String,
+      default: null
+    }
   },
   { timestamps: true }
 );
