@@ -177,6 +177,78 @@ const getClassWithStudentCount = async (req, res) => {
   }
 };
 
+// =====================================================
+// GET LOGGED-IN STUDENT PROFILE
+// =====================================================
+
+const getMyStudentProfile = async (req, res) => {
+  try {
+
+    // authMiddleware ke baad req.user available hoga
+    const user = req.user;
+
+    if (!user) {
+      return res.status(401).json({
+        success: false,
+        message: "Unauthorized"
+      });
+    }
+
+    const studentId =
+      user.idNumber ||
+      user.studentId ||
+      user.username;
+
+    if (!studentId) {
+      return res.status(404).json({
+        success: false,
+        message: "Student ID not found in login account"
+      });
+    }
+
+    const student = await Student.findOne({
+      studentId: studentId
+    }).lean();
+
+    if (!student) {
+      return res.status(404).json({
+        success: false,
+        message: "Student profile not found"
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: "Student profile fetched successfully",
+      student: {
+        _id: student._id,
+        studentId: student.studentId,
+        name: student.name,
+        fatherName: student.fatherName,
+        className: student.className,
+        section: student.section,
+        rollNumber: student.rollNumber,
+        mobile: student.mobile,
+        address: student.address,
+        createdAt: student.createdAt,
+        updatedAt: student.updatedAt
+      }
+    });
+
+  } catch (error) {
+
+    console.error(
+      "Get my student profile error:",
+      error
+    );
+
+    return res.status(500).json({
+      success: false,
+      message: "Failed to fetch student profile"
+    });
+  }
+};
+
 // ======================
 // EXPORTS
 // ======================
@@ -187,5 +259,6 @@ module.exports = {
   updateStudent,
   deleteStudent,
   getStudentsByClass,
-  getClassWithStudentCount
+  getClassWithStudentCount,
+  getMyStudentProfile
 };
