@@ -184,7 +184,7 @@ const getClassWithStudentCount = async (req, res) => {
 const getMyStudentProfile = async (req, res) => {
   try {
 
-    // authMiddleware ke baad req.user available hoga
+    // authMiddleware se complete User milega
     const user = req.user;
 
     if (!user) {
@@ -194,10 +194,8 @@ const getMyStudentProfile = async (req, res) => {
       });
     }
 
-    const studentId =
-      user.idNumber ||
-      user.studentId ||
-      user.username;
+    // User ka idNumber hi Student ka login ID hai
+    const studentId = user.idNumber;
 
     if (!studentId) {
       return res.status(404).json({
@@ -206,6 +204,7 @@ const getMyStudentProfile = async (req, res) => {
       });
     }
 
+    // Student collection me studentId se profile find karo
     const student = await Student.findOne({
       studentId: studentId
     }).lean();
