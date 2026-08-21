@@ -183,8 +183,6 @@ const getClassWithStudentCount = async (req, res) => {
 
 const getMyStudentProfile = async (req, res) => {
   try {
-
-    // authMiddleware se complete User milega
     const user = req.user;
 
     if (!user) {
@@ -194,52 +192,32 @@ const getMyStudentProfile = async (req, res) => {
       });
     }
 
-    // User ka idNumber hi Student ka login ID hai
-    const studentId = user.idNumber;
-
-    if (!studentId) {
+    if (!user.idNumber) {
       return res.status(404).json({
         success: false,
-        message: "Student ID not found in login account"
+        message: "Student ID number not found in login account"
       });
     }
 
-    // Student collection me studentId se profile find karo
     const student = await Student.findOne({
-    studentId: user.studentId
+      idNumber: user.idNumber
     }).lean();
 
-    if (!user.studentId) {
-    return res.status(404).json({
+    if (!student) {
+      return res.status(404).json({
         success: false,
-        message: "Student account is not linked with a student profile"
+        message: "Student profile not found"
       });
     }
 
     return res.status(200).json({
       success: true,
       message: "Student profile fetched successfully",
-      student: {
-        _id: student._id,
-        studentId: student.studentId,
-        name: student.name,
-        fatherName: student.fatherName,
-        className: student.className,
-        section: student.section,
-        rollNumber: student.rollNumber,
-        mobile: student.mobile,
-        address: student.address,
-        createdAt: student.createdAt,
-        updatedAt: student.updatedAt
-      }
+      student
     });
 
   } catch (error) {
-
-    console.error(
-      "Get my student profile error:",
-      error
-    );
+    console.error("Get my student profile error:", error);
 
     return res.status(500).json({
       success: false,
