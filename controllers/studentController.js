@@ -206,13 +206,13 @@ const getMyStudentProfile = async (req, res) => {
 
     // Student collection me studentId se profile find karo
     const student = await Student.findOne({
-      studentId: studentId
+    studentId: user.studentId
     }).lean();
 
-    if (!student) {
-      return res.status(404).json({
+    if (!user.studentId) {
+    return res.status(404).json({
         success: false,
-        message: "Student profile not found"
+        message: "Student account is not linked with a student profile"
       });
     }
 
