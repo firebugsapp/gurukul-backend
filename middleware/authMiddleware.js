@@ -1,6 +1,7 @@
 const jwt = require("jsonwebtoken");
+const User = require("../models/User");
 
-const protect = (req, res, next) => {
+const protect = async (req, res, next) => {
   try {
     let token;
 
@@ -13,15 +14,34 @@ const protect = (req, res, next) => {
     }
 
     if (!token) {
-      return res.status(401).json({ message: "Unauthorized, token missing ❌" });
+      return res.status(401).json({
+        message: "Unauthorized, token missing ❌"
+      });
     }
 
+    // Verify JWT
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
-    req.user = decoded; // { id, role, iat, exp }
+    // JWT se actual User database se fetch karo
+    const user = await User.findById(decoded.id).select("-password");
+
+    if (!user) {
+      return res.status(401).json({
+        message: "User account not found ❌"
+      });
+    }
+
+    // Ab req.user me complete user milega
+    req.user = user;
+
     next();
+
   } catch (error) {
-    return res.status(401).json({ message: "Unauthorized, invalid token ❌" });
+    console.error("AUTH ERROR:", error);
+
+    return res.status(401).json({
+      message: "Unauthorized, invalid token ❌"
+    });
   }
 };
 
