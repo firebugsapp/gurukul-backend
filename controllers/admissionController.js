@@ -1,4 +1,5 @@
 const Admission = require("../models/Admission");
+const Counter = require("../models/Counter");
 
 // ======================
 // GENERATE ADMISSION NUMBER
@@ -172,6 +173,14 @@ const approveAdmission = async (req, res) => {
     const admission = await Admission.findById(id);
     const totalStudents = await Student.countDocuments();
     const newRollNumber = totalStudents + 1;
+    const counter = await Counter.findOneAndUpdate(
+  { name: "studentId" },
+  { $inc: { seq: 1 } },
+  { new: true, upsert: true }
+);
+
+const formattedStudentId =
+  "GKL" + String(counter.seq).padStart(5, "0");
 
     if (!admission) {
       return res.status(404).json({ message: "Admission not found ❌" });
@@ -183,16 +192,16 @@ const approveAdmission = async (req, res) => {
     }
 
     // Create student in Students collection
-    const newStudent = await Student.create({
-      name: admission.name,
-      fatherName: admission.fatherName,
-      className: admission.className,
-      section: admission.section,
-      rollNumber: newRollNumber,
-      mobile: admission.mobile,
-      address: admission.address,
-    });
-
+const newStudent = await Student.create({
+  studentId: formattedStudentId,
+  name: admission.name,
+  fatherName: admission.fatherName,
+  className: admission.className,
+  section: admission.section,
+  rollNumber: newRollNumber,
+  mobile: admission.mobile,
+  address: admission.address,
+});
     // Update admission status
     admission.status = "Approved";
     admission.studentCreated = true;
