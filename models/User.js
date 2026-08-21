@@ -14,6 +14,11 @@ const userSchema = new mongoose.Schema(
       unique: true
     },
 
+    studentId: {
+      type: String,
+      default: null
+    },
+
     password: {
       type: String,
       required: true
