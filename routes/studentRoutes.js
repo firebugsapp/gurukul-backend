@@ -10,7 +10,8 @@ const {
   updateStudent,
   deleteStudent,
   getStudentsByClass,
-  getClassWithStudentCount
+  getClassWithStudentCount,
+  getMyStudentProfile
 } = require("../controllers/studentController");
 
 // ======================
@@ -25,6 +26,9 @@ router.get("/class-count", protect, getClassWithStudentCount);
 
 // Get students by class (IMPORTANT: Above /:id)
 router.get("/class/:className", protect, getStudentsByClass);
+
+// Get logged-in student's own profile
+router.get("/my-profile", protect, getMyStudentProfile);
 
 // Get all students
 router.get("/", protect, getAllStudents);
